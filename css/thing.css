@@ -1,7 +1,6 @@
 body {
 	width: 960px;
 	margin: 0 auto;
-	padding: 2em 0;
 }
 #field-container {
 	margin: 1em 0;
@@ -67,4 +66,9 @@ body {
 }
 .last-flag.show {
 	display: inherit;
+}
+.footer {
+	margin-top: 8em;
+	font-size: 0.8em;
+	color: #888;
 }
