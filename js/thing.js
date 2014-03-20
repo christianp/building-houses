@@ -4,6 +4,19 @@ var flags;
 
 var posformatter = d3.format('.3f');
 
+function ordinal(n) {
+	switch(n%10) {
+	case 1:
+		return n+'st';
+	case 2:
+		return n+'nd';
+	case 3:
+		return n+'rd';
+	default:
+		return n+'th';
+	}
+}
+
 function updatePlots() {
 
 	var plotWidth = 1/plots.length;
@@ -72,8 +85,7 @@ function updatePlots() {
 	flag_list.exit().remove();
 
 	$('#fail').toggle(!isValid());
-	$('#score').text(flags.length-1);
-	$('#flag-pluralise').text(flags.length==2 ? 'flag' : 'flags');
+	$('#score').text(ordinal(flags.length));
 }
 
 function addPlot() {
@@ -150,6 +162,8 @@ $(document).ready(function() {
 	;
 
 	field.on('mousedown',function() {
+		if(d3.event.button!=0)
+			return;
 		var x = d3.mouse(this)[0]-20;
 		addFlag(x/900);
 	});
