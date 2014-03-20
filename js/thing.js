@@ -127,28 +127,31 @@ function addFlag(x) {
 	flags.push(x);
 	updatePlots();
 
-	setFail(!isValid());
+	var fail = !isValid();
+	if(fail) {
+		var last_flag_x = flags.pop();
+		last_flag
+			.classed('show',true)
+			.attr('transform','translate('+(last_flag_x*900+20)+',55)')
+		;
+	}
+	setFail(fail);
 	if(failed) {
 		plots = plots.slice(0,flags.length);
 		updatePlots();
 	}
 	else {
 		addPlot();
+		updatePlots();
+		updateHopelessWarning();
 	}
 }
 
-function checkFails() {
-}
-
 function setFail(fail) {
+	$('#hopeless-warning').hide();
 	failed = fail;
 	$('#fail').toggle(failed);
 	if(failed) {
-		var last_flag_x = flags.pop();
-		last_flag
-			.classed('show',true)
-			.attr('transform','translate('+(last_flag_x*900+20)+',55)')
-		;
 		$('#score').text(flags.length);
 		$('#flag-pluralise').text(flags.length==1 ? 'flag' : 'flags');
 		$('#last-flag').text(ordinal(flags.length+1));
@@ -160,18 +163,27 @@ function setFail(fail) {
 	}
 }
 
+function updateHopelessWarning() {
+	$('#hopeless-warning').toggle(d3.max(plots)>1);
+}
+function seeWhy() {
+	plots.pop();
+	updatePlots();
+	setFail(true);
+}
+
 function undo() {
 	if(failed) {
-		plots.push(0);
 		setFail(false);
 	}
 	else {
 		flags.pop();
-		plots = plots.slice(0,flags.length+1);
-		while(plots.length<flags.length+1)
-			plots.push(0);
 	}
+	plots = plots.slice(0,flags.length+1);
+	while(plots.length<flags.length+1)
+		plots.push(0);
 	updatePlots();
+	updateHopelessWarning();
 }
 
 function reset() {
@@ -263,6 +275,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		addTextFlag();
 	});
+	$('#see-why').on('click',seeWhy);
 
 	reset();
 });
