@@ -1,0 +1,62 @@
+body {
+	width: 960px;
+	margin: 0 auto;
+	padding: 2em 0;
+}
+#field-container {
+	margin: 1em 0;
+}
+#field {
+	width: 900px;
+	height: 40px;
+}
+
+.plot path {
+	fill: none;
+	stroke: black;
+}
+.plot rect {
+	opacity: 0.2;
+}
+.plot.occupied rect {
+	fill: blue;
+}
+.plot.empty rect {
+	fill: green;
+}
+.plot.crowded rect {
+	fill: red;
+	opacity: 0.6;
+}
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.axis line {
+  stroke: black;
+}
+
+.axis-minor line, .axis-minor path {
+  stroke-opacity: .5;
+}
+
+.axis .domain {
+	fill:none;
+	stroke: black;
+}
+.new-flag {
+	display: none;
+}
+.new-flag.show {
+	display: inherit;
+}
+.new-flag line {
+	opacity: 0.4;
+	stroke: black;
+}
+#fail {
+	display: none;
+}
+#fail #score {
+	font-weight: bold;
+}
