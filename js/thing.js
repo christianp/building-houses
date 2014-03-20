@@ -69,6 +69,8 @@ function updatePlots() {
 		.style('display',flags.length ? 'inherit' : 'none')
 	;
 
+	flag_list.exit().remove();
+
 	$('#fail').toggle(!isValid());
 	$('#score').text(flags.length-1);
 	$('#flag-pluralise').text(flags.length==2 ? 'flag' : 'flags');
