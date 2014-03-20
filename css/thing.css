@@ -57,6 +57,14 @@ body {
 #fail {
 	display: none;
 }
-#fail #score {
+#fail #score, #fail #last-flag {
 	font-weight: bold;
+}
+.last-flag {
+	display: none;
+	stroke: red;
+	stroke-width: 2px;
+}
+.last-flag.show {
+	display: inherit;
 }

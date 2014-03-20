@@ -1,6 +1,8 @@
 var field;
 var plots;
 var flags;
+var failed;
+var last_flag;
 
 var posformatter = d3.format('.3f');
 
@@ -84,8 +86,10 @@ function updatePlots() {
 
 	flag_list.exit().remove();
 
-	$('#fail').toggle(!isValid());
-	$('#score').text(ordinal(flags.length));
+	$('#fail').toggle(failed);
+	$('#score').text(flags.length);
+	$('#flag-pluralise').text(flags.length==1 ? 'flag' : 'flags');
+	$('#last-flag').text(ordinal(flags.length+1));
 }
 
 function addPlot() {
@@ -119,12 +123,32 @@ function addFlag(x) {
 
 	if(isValid())
 		addPlot();
+
+	checkFails();
+}
+
+function checkFails() {
+	failed = false;
+	updatePlots();
+	if(!isValid()) {
+		failed = true;
+		var last_flag_x = flags.pop();
+		plots = plots.slice(0,flags.length);
+		updatePlots();
+		last_flag
+			.classed('show',true)
+			.attr('transform','translate('+(last_flag_x*900+20)+',55)')
+		;
+	}
 }
 
 function undo() {
 	flags.pop();
 	plots = plots.slice(0,flags.length+1);
+	while(plots.length<flags.length+1)
+		plots.push(0);
 	updatePlots();
+	checkFails();
 }
 
 function reset() {
@@ -155,10 +179,17 @@ $(document).ready(function() {
 			.attr('x2','0')
 	new_flag.append('circle')
 					.attr('r',5)
-					.attr('y',55)
 	;
 	var new_flag_pos = new_flag.append('text')
 						.attr('transform','translate(0,-10)')
+	;
+
+	last_flag = field.append('g')
+						.attr('class','last-flag')
+						.classed('show',false)
+	;
+	last_flag.append('path')
+				.attr('d','M-5,-5L5,5M5,-5L-5,5')
 	;
 
 	field.on('mousedown',function() {
