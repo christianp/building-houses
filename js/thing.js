@@ -21,8 +21,10 @@ function ordinal(n) {
 
 function updatePlots() {
 
+	// work out how wide a plot is
 	var plotWidth = 1/plots.length;
 
+	// count how many flags are in each plot
 	var sorted_flags = flags.slice().sort();
 	plots = plots.map(function(){return 0})
 	sorted_flags.map(function(x) {
@@ -32,30 +34,36 @@ function updatePlots() {
 		plots[plot] += 1;
 	});
 
+	// create the displays for each plot
 	var plot = field.select('.plots').selectAll('.plot')
 				.data(plots);
 
-	var g = plot.enter()
+	plot.enter()
 					.append('g')
 					.attr('class','plot')
+					.append('rect');
 	;
-	g.append('rect');
-
+	// size and position all the plots
 	plot
 		.attr('transform',function(d,i) {
 			return "translate("+(((904-plots.length*4)*plotWidth+4)*i+20)+",30)";
 		})
-		.classed('empty',function(d) { return d==0 })
-		.classed('occupied',function(d) {return d==1 })
-		.classed('crowded',function(d) {return d>1 })
 	;
 	plot.select('rect')
 		.attr('width',function(d,i){return (904-plots.length*4)*plotWidth})
 		.attr('height',50);
 	;
 
+	// classify plots based on how many flags they have in thema
+	plot
+		.classed('empty',function(d) { return d==0 })
+		.classed('occupied',function(d) {return d==1 })
+		.classed('crowded',function(d) {return d>1 })
+	;
+
 	plot.exit().remove();
 
+	// create the displays for each flag
 	var flag = field.select('.flags').selectAll('.flag')
 				.data(sorted_flags)
 
@@ -63,16 +71,18 @@ function updatePlots() {
 		.append('g')
 			.attr('class','flag')
 			.append('circle')
+				.attr('r',5);
 	;
 
-	flag.select('circle')
+	// position each flag
+	flag
 		.attr('transform',function(d) {
 				return 'translate('+(d*900+20)+',55)';
 		})
-		.attr('r',5);
 
 	flag.exit().remove();
 
+	// show the positions of the placed flags in a list
 	var flag_list = d3.select('.flag-list ul').selectAll('li')
 						.data(flags);
 
@@ -86,10 +96,6 @@ function updatePlots() {
 
 	flag_list.exit().remove();
 
-	$('#fail').toggle(failed);
-	$('#score').text(flags.length);
-	$('#flag-pluralise').text(flags.length==1 ? 'flag' : 'flags');
-	$('#last-flag').text(ordinal(flags.length+1));
 }
 
 function addPlot() {
@@ -115,46 +121,64 @@ function addTextFlag() {
 }
 
 function addFlag(x) {
-	if(!isValid() || x<0 || x>1)
+	if(failed || x<0 || x>1)
 		return;
 
 	flags.push(x);
 	updatePlots();
 
-	if(isValid())
+	setFail(!isValid());
+	if(failed) {
+		plots = plots.slice(0,flags.length);
+		updatePlots();
+	}
+	else {
 		addPlot();
-
-	checkFails();
+	}
 }
 
 function checkFails() {
-	failed = false;
-	updatePlots();
-	if(!isValid()) {
-		failed = true;
+}
+
+function setFail(fail) {
+	failed = fail;
+	$('#fail').toggle(failed);
+	if(failed) {
 		var last_flag_x = flags.pop();
-		plots = plots.slice(0,flags.length);
-		updatePlots();
 		last_flag
 			.classed('show',true)
 			.attr('transform','translate('+(last_flag_x*900+20)+',55)')
+		;
+		$('#score').text(flags.length);
+		$('#flag-pluralise').text(flags.length==1 ? 'flag' : 'flags');
+		$('#last-flag').text(ordinal(flags.length+1));
+	}
+	else {
+		last_flag
+			.classed('show',false)
 		;
 	}
 }
 
 function undo() {
-	flags.pop();
-	plots = plots.slice(0,flags.length+1);
-	while(plots.length<flags.length+1)
+	if(failed) {
 		plots.push(0);
+		setFail(false);
+	}
+	else {
+		flags.pop();
+		plots = plots.slice(0,flags.length+1);
+		while(plots.length<flags.length+1)
+			plots.push(0);
+	}
 	updatePlots();
-	checkFails();
 }
 
 function reset() {
 	plots = [1];
 	flags = [];
 	updatePlots();
+	setFail(false);
 }
 
 
@@ -199,7 +223,7 @@ $(document).ready(function() {
 		addFlag(x/900);
 	});
 	field.on('mousemove',function() {
-		if(!isValid())
+		if(failed)
 			return;
 		var x = d3.mouse(this)[0] - 20;
 		new_flag.classed('show',x>=0 && x<900)
