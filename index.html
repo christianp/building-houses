@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>The Lazy Farmer Flag Game</title>
+		<title>Building Houses</title>
 
 		<!-- jquery -->
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -14,14 +14,14 @@
 		<link rel="stylesheet" href="css/thing.css"></link>
 	</head>
 	<body>
-		<h1>The Lazy Farmer Flag Game</h1>
+		<h1>Building Houses</h1>
 		<div class="explanation">
-			<p>Place flags so that each of the equally-sized plots has exactly one flag in it. Each time you place a flag, the plots get resized so another one can fit in.</p>
-			<p>The graphic below shows you the flags you've placed, as well as the plots that will need to be occupied when you place your <strong>next</strong> flag.
-			<p>Click on a plot or write a position in the box to place a flag</p>
+			<p>Place houses so that each of the equally-sized plots has exactly one house in it. Each time you place a house, the plots get resized so another one can fit in.</p>
+			<p>The graphic below shows you the houses you've placed, as well as the plots that will need to be occupied when you place your <strong>next</strong> house.
+			<p>Click on a plot or write a position in the box to place a house</p>
 		</div>
 		<form id="text-input">
-			<label>Add a flag at position: <input type="text"/></label>
+			<label>Add a house at position: <input type="text"/></label>
 			<button>please</button>
 		</form>
 		<div id="field-container">
@@ -30,15 +30,15 @@
 			<button id="reset">Reset</button>
 		</div>
 		<div id="hopeless-warning">
-			<p>Oops! No matter where you place your next flag, there will be two flags in the same plot.</p>
+			<p>Oops! No matter where you place your next house, there will be two houses in the same plot.</p>
 			<button id="see-why">Show my last working solution</button>
 		</div>
 		<div id="fail">
-			<p>You successfully placed <span id="score"></span> <span id="flag-pluralise">flags</span>.
+			<p>You successfully placed <span id="score"></span> <span id="house-pluralise">houses</span>.
 		</div>
 
-		<div class="flag-list">
-			<h4>Placed flags</h4>
+		<div class="house-list">
+			<h4>Placed houses</h4>
 			<ul></ul>
 		</div>
 

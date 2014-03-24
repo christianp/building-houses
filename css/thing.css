@@ -43,28 +43,28 @@ body {
 	fill:none;
 	stroke: black;
 }
-.new-flag {
+.new-house {
 	display: none;
 }
-.new-flag.show {
+.new-house.show {
 	display: inherit;
 }
-.new-flag line {
+.new-house line {
 	opacity: 0.4;
 	stroke: black;
 }
 #fail {
 	display: none;
 }
-#fail #score, #fail #last-flag {
+#fail #score, #fail #last-house {
 	font-weight: bold;
 }
-.last-flag {
+.last-house {
 	display: none;
 	stroke: red;
 	stroke-width: 2px;
 }
-.last-flag.show {
+.last-house.show {
 	display: inherit;
 }
 .footer {

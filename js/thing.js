@@ -1,8 +1,8 @@
 var field;
 var plots;
-var flags;
+var houses;
 var failed;
-var last_flag;
+var last_house;
 
 var posformatter = d3.format('.3f');
 
@@ -24,10 +24,10 @@ function updatePlots() {
 	// work out how wide a plot is
 	var plotWidth = 1/plots.length;
 
-	// count how many flags are in each plot
-	var sorted_flags = flags.slice().sort();
+	// count how many houses are in each plot
+	var sorted_houses = houses.slice().sort();
 	plots = plots.map(function(){return 0})
-	sorted_flags.map(function(x) {
+	sorted_houses.map(function(x) {
 		var plot = Math.floor(x/plotWidth);
 		if(plot>plots.length-1)
 			plot -= 1;
@@ -54,7 +54,7 @@ function updatePlots() {
 		.attr('height',50);
 	;
 
-	// classify plots based on how many flags they have in thema
+	// classify plots based on how many houses they have in thema
 	plot
 		.classed('empty',function(d) { return d==0 })
 		.classed('occupied',function(d) {return d==1 })
@@ -63,38 +63,38 @@ function updatePlots() {
 
 	plot.exit().remove();
 
-	// create the displays for each flag
-	var flag = field.select('.flags').selectAll('.flag')
-				.data(sorted_flags)
+	// create the displays for each house
+	var house = field.select('.houses').selectAll('.house')
+				.data(sorted_houses)
 
-	flag.enter()
+	house.enter()
 		.append('g')
-			.attr('class','flag')
+			.attr('class','house')
 			.append('circle')
 				.attr('r',5);
 	;
 
-	// position each flag
-	flag
+	// position each house
+	house
 		.attr('transform',function(d) {
 				return 'translate('+(d*900+20)+',55)';
 		})
 
-	flag.exit().remove();
+	house.exit().remove();
 
-	// show the positions of the placed flags in a list
-	var flag_list = d3.select('.flag-list ul').selectAll('li')
-						.data(flags);
+	// show the positions of the placed houses in a list
+	var house_list = d3.select('.house-list ul').selectAll('li')
+						.data(houses);
 
-	flag_list.enter()
+	house_list.enter()
 				.append('li')
 				.text(function(d){return posformatter(d)});
 	;
-	d3.select('.flag-list')
-		.style('display',flags.length ? 'inherit' : 'none')
+	d3.select('.house-list')
+		.style('display',houses.length ? 'inherit' : 'none')
 	;
 
-	flag_list.exit().remove();
+	house_list.exit().remove();
 
 }
 
@@ -124,20 +124,20 @@ function addFlag(x) {
 	if(failed || x<0 || x>1)
 		return;
 
-	flags.push(x);
+	houses.push(x);
 	updatePlots();
 
 	var fail = !isValid();
 	if(fail) {
-		var last_flag_x = flags.pop();
-		last_flag
+		var last_house_x = houses.pop();
+		last_house
 			.classed('show',true)
-			.attr('transform','translate('+(last_flag_x*900+20)+',55)')
+			.attr('transform','translate('+(last_house_x*900+20)+',55)')
 		;
 	}
 	setFail(fail);
 	if(failed) {
-		plots = plots.slice(0,flags.length);
+		plots = plots.slice(0,houses.length);
 		updatePlots();
 	}
 	else {
@@ -152,12 +152,12 @@ function setFail(fail) {
 	failed = fail;
 	$('#fail').toggle(failed);
 	if(failed) {
-		$('#score').text(flags.length);
-		$('#flag-pluralise').text(flags.length==1 ? 'flag' : 'flags');
-		$('#last-flag').text(ordinal(flags.length+1));
+		$('#score').text(houses.length);
+		$('#house-pluralise').text(houses.length==1 ? 'house' : 'houses');
+		$('#last-house').text(ordinal(houses.length+1));
 	}
 	else {
-		last_flag
+		last_house
 			.classed('show',false)
 		;
 	}
@@ -177,10 +177,10 @@ function undo() {
 		setFail(false);
 	}
 	else {
-		flags.pop();
+		houses.pop();
 	}
-	plots = plots.slice(0,flags.length+1);
-	while(plots.length<flags.length+1)
+	plots = plots.slice(0,houses.length+1);
+	while(plots.length<houses.length+1)
 		plots.push(0);
 	updatePlots();
 	updateHopelessWarning();
@@ -188,7 +188,7 @@ function undo() {
 
 function reset() {
 	plots = [1];
-	flags = [];
+	houses = [];
 	updatePlots();
 	setFail(false);
 }
@@ -202,29 +202,29 @@ $(document).ready(function() {
 		.attr('height',90)
 	;
 	field.append('g').attr('class','plots');
-	field.append('g').attr('class','flags');
+	field.append('g').attr('class','houses');
 
-	var new_flag = field.append('g')
-					.attr('class','new-flag')
+	var new_house = field.append('g')
+					.attr('class','new-house')
 					.classed('show',false)
 	;
-	new_flag.append('line')
+	new_house.append('line')
 			.attr('x1','0')
 			.attr('y1','-45')
 			.attr('y2','25')
 			.attr('x2','0')
-	new_flag.append('circle')
+	new_house.append('circle')
 					.attr('r',5)
 	;
-	var new_flag_pos = new_flag.append('text')
+	var new_house_pos = new_house.append('text')
 						.attr('transform','translate(0,-10)')
 	;
 
-	last_flag = field.append('g')
-						.attr('class','last-flag')
+	last_house = field.append('g')
+						.attr('class','last-house')
 						.classed('show',false)
 	;
-	last_flag.append('path')
+	last_house.append('path')
 				.attr('d','M-5,-5L5,5M5,-5L-5,5')
 	;
 
@@ -238,13 +238,13 @@ $(document).ready(function() {
 		if(failed)
 			return;
 		var x = d3.mouse(this)[0] - 20;
-		new_flag.classed('show',x>=0 && x<900)
+		new_house.classed('show',x>=0 && x<900)
 				.attr('transform','translate('+(x+20)+',55)')
 		;
-		new_flag_pos.text(posformatter(x/900));
+		new_house_pos.text(posformatter(x/900));
 	})
 	field.on('mouseout',function() {
-		new_flag.classed('show',false);
+		new_house.classed('show',false);
 	});
 
 	var xScale = d3.scale.linear().domain([0,1]).range([0,900]);
