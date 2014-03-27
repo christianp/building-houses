@@ -28,7 +28,7 @@ function updatePlots() {
 	var sorted_houses = houses.slice().sort();
 	plots = plots.map(function(){return 0})
 	sorted_houses.map(function(x) {
-		var plot = Math.floor(x/plotWidth);
+		var plot = Math.floor(x*plots.length);
 		if(plot>plots.length-1)
 			plot -= 1;
 		plots[plot] += 1;
