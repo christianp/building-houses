@@ -4,8 +4,10 @@ var houses;
 var failed;
 var last_house;
 
+// formatter to round figures to 3 decimal places
 var posformatter = d3.format('.3f');
 
+// format a number as an ordinal
 function ordinal(n) {
 	switch(n%10) {
 	case 1:
@@ -19,6 +21,7 @@ function ordinal(n) {
 	}
 }
 
+// Update the plots display
 function updatePlots() {
 
 	// work out how wide a plot is
@@ -98,11 +101,13 @@ function updatePlots() {
 
 }
 
+// add a plot, then recalculate the display
 function addPlot() {
 	plots.push(plots.length+1);
 	updatePlots();
 };
 
+// is the current setup valid? If any plot has more than one house, then no
 function isValid() {
 	for(var i=0;i<plots.length;i++) {
 		if(plots[i]>1)
@@ -111,42 +116,54 @@ function isValid() {
 	return true;
 }
 
-function addTextFlag() {
+// add a house from the text input
+function addTextHouse() {
 	var input = $('#text-input input');
 	var x = parseFloat(input.val());
 	if(x>=0 && x<=1) {
-		addFlag(x);
+		addHouse(x);
 	}
 	input.val('');
 }
 
-function addFlag(x) {
+// add a house at position x
+function addHouse(x) {
+
+	// can't add houses when in the fail state, and check that x is in the interval [0,1]
 	if(failed || x<0 || x>1)
 		return;
 
+	// add the house to the list, and recalculate the display
 	houses.push(x);
 	updatePlots();
 
+	// are we now in a failed state?
 	var fail = !isValid();
 	if(fail) {
+		// if so, remove the house we just added, and move the failed house marker to its position.
 		var last_house_x = houses.pop();
 		last_house
 			.classed('show',true)
 			.attr('transform','translate('+(last_house_x*900+20)+',55)')
 		;
 	}
+	// update everything on the page to reflect the fail state
 	setFail(fail);
+
+	//if we failed, remove a plot so we can show the last working solution
 	if(failed) {
 		plots = plots.slice(0,houses.length);
 		updatePlots();
 	}
 	else {
+		// if we didn't fail, add another plot for the next step, and check whether the situation is hopeless (two houses in the same plot, no matter where the next one goes)
 		addPlot();
 		updatePlots();
 		updateHopelessWarning();
 	}
 }
 
+// update the page to reflect whether we're in the fail state
 function setFail(fail) {
 	$('#hopeless-warning').hide();
 	failed = fail;
@@ -164,28 +181,43 @@ function setFail(fail) {
 }
 
 function updateHopelessWarning() {
-	$('#hopeless-warning').toggle(d3.max(plots)>1);
+	// the situation is hopeless if any plot has more than one house in it
+	var hopeless = d3.max(plots)>1;
+	$('#hopeless-warning').toggle(hopeless);
 }
-function seeWhy() {
+
+// when the user clicks on the "see last working solution" button
+function seeLastWorkingSolution() {
+	// get rid of a plot
 	plots.pop();
+	// recalculate the display
 	updatePlots();
+	// we're now in the fail state
 	setFail(true);
 }
 
+// undo the last move
 function undo() {
+	// if we're in the fail state, we just need to say we're not in the fail state any more
 	if(failed) {
 		setFail(false);
 	}
+	// if we're fine, just remove the last placed house
 	else {
 		houses.pop();
 	}
+
+	// make sure we have the right number of plots
 	plots = plots.slice(0,houses.length+1);
 	while(plots.length<houses.length+1)
 		plots.push(0);
+
+	// recalculate the display
 	updatePlots();
 	updateHopelessWarning();
 }
 
+// reset the game
 function reset() {
 	plots = [1];
 	houses = [];
@@ -193,8 +225,8 @@ function reset() {
 	setFail(false);
 }
 
-
 $(document).ready(function() {
+	// create the field
 	field = d3.select('.field');
 
 	field
@@ -204,6 +236,7 @@ $(document).ready(function() {
 	field.append('g').attr('class','plots');
 	field.append('g').attr('class','houses');
 
+	// create the new house marker
 	var new_house = field.append('g')
 					.attr('class','new-house')
 					.classed('show',false)
@@ -220,6 +253,7 @@ $(document).ready(function() {
 						.attr('transform','translate(0,-10)')
 	;
 
+	// create the last (failed) house marker
 	last_house = field.append('g')
 						.attr('class','last-house')
 						.classed('show',false)
@@ -228,12 +262,15 @@ $(document).ready(function() {
 				.attr('d','M-5,-5L5,5M5,-5L-5,5')
 	;
 
+	// when you click on the field, place a house there
 	field.on('mousedown',function() {
 		if(d3.event.button!=0)
 			return;
 		var x = d3.mouse(this)[0]-20;
-		addFlag(x/900);
+		addHouse(x/900);
 	});
+
+	// the new house marker follows the mouse
 	field.on('mousemove',function() {
 		if(failed)
 			return;
@@ -247,6 +284,7 @@ $(document).ready(function() {
 		new_house.classed('show',false);
 	});
 
+	// create the scale
 	var xScale = d3.scale.linear().domain([0,1]).range([0,900]);
 	var axis = d3.svg.axis()
 				.scale(xScale)
@@ -269,13 +307,15 @@ $(document).ready(function() {
 	axis_g.append('g').call(axis);
 	axis_g.append('g').attr('class','axis-minor').call(axis_minor);
 
+	// set button click events
 	$('button#undo').on('click',undo);
 	$('button#reset').on('click',reset);
 	$('#text-input').on('submit',function(e) {
 		e.preventDefault();
-		addTextFlag();
+		addTextHouse();
 	});
-	$('#see-why').on('click',seeWhy);
+	$('#see-why').on('click',seeLastWorkingSolution);
 
+	// start the game
 	reset();
 });
