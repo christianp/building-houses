@@ -124,6 +124,7 @@ function addTextHouse() {
 		addHouse(x);
 	}
 	input.val('');
+	$("#text-input input").focus(); // sets the focus back int the text box 
 }
 
 // add a house at position x
