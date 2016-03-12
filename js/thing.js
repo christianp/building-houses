@@ -73,8 +73,8 @@ function updatePlots() {
 	house.enter()
 		.append('g')
 			.attr('class','house')
-			.append('circle')
-				.attr('r',5);
+			.append('use')
+				.attr('xlink:href','#house');
 	;
 
 	// position each house
@@ -246,8 +246,8 @@ $(document).ready(function() {
 			.attr('y1','-45')
 			.attr('y2','25')
 			.attr('x2','0')
-	new_house.append('circle')
-					.attr('r',5)
+	new_house.append('use')
+					.attr('xlink:href','#house')
 	;
 	var new_house_pos = new_house.append('text')
 						.attr('transform','translate(0,-10)')
