@@ -7,5 +7,5 @@ The aim is to place flags on a field of length 1, so that when you divide the fi
 
 made by cp. Released under the MIT licence.
 
-This uses d3, jQuery, and normalize.css, which all have their own licences.
+This uses d3, jQuery, normalize.css, and a picture of a house from [Emoji One](http://emojione.com), which all have their own licences.
 
